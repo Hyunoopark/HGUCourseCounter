@@ -19,7 +19,7 @@ public class HGUCoursePatternAnalyzer {
 	 * Run method must not be changed!!
 	 * @param args
 	 */
-	public void run(String[] args) {
+	public void run(String[] args){
 		
 		try {
 			// when there are not enough arguments from CLI, it throws the NotEnoughArgmentException which must be defined by you.
@@ -53,10 +53,25 @@ public class HGUCoursePatternAnalyzer {
 	 * @return
 	 */
 	private HashMap<String,Student> loadStudentCourseRecords(ArrayList<String> lines) {
+		students = new HashMap<String,Student>();
 		
-		// TODO: Implement this method
+		Student aStudent = new Student(lines.get(1).split(", ")[0]);
 		
-		return null; // do not forget to return a proper variable.
+		for(String aline:lines) {	
+	
+				Course aCourse = new Course(aline);
+
+				if(aStudent.getStudentId().equals(aCourse.getStudentId())){
+					aStudent.addCourse(aCourse);
+					students.put(aStudent.getStudentId(),aStudent);
+				}
+				
+				else {
+					aStudent = new Student(aCourse.getStudentId());
+					aStudent.addCourse(aCourse);
+				}
+		}
+		return students;
 	}
 
 	/**
@@ -74,8 +89,19 @@ public class HGUCoursePatternAnalyzer {
 	 */
 	private ArrayList<String> countNumberOfCoursesTakenInEachSemester(Map<String, Student> sortedStudents) {
 		
-		// TODO: Implement this method
+		ArrayList<String> coursesTakenInEachSemester = new ArrayList<String>();
+		String st = null;
 		
-		return null; // do not forget to return a proper variable.
+		
+		for (String k : sortedStudents.keySet()) {
+		    Student s = sortedStudents.get(k);
+		    
+		    for(int i = 1; i <= s.getSemestersByYearAndSemester().size(); i++) {
+		    	st = k + "," + s.getSemestersByYearAndSemester().size() + "," + i + "," + s.getNumCourseInNthSemester(i);
+			    coursesTakenInEachSemester.add(st);
+		    }
+		}
+		
+		return coursesTakenInEachSemester; 
 	}
 }
