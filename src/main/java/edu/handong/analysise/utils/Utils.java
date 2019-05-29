@@ -1,81 +1,53 @@
 package edu.handong.analysise.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVPrinter;
+
+//import java.io.BufferedWriter;
+//import java.io.BufferedReader;
+//import java.io.File;
 import java.io.FileNotFoundException;
+//import java.io.Reader;
+//import java.nio.file.Files;
+//import java.nio.file.Paths;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+//import java.util.List;
 
 public class Utils {
 
-	public static ArrayList<String> getLines(String file, boolean removeHeader) {
-		File csvFile = new File(file);
-		ArrayList<String> lines = new ArrayList<String>();
+	public static ArrayList<CSVRecord> getLines(String file, boolean removeHeader) throws FileNotFoundException, IOException {
+
+		ArrayList<CSVRecord> lines = new ArrayList<CSVRecord>();
 		
 		try {
-			FileReader in = new FileReader(csvFile);
-			BufferedReader bufReader = new BufferedReader(in);
-			String line = null;
-		
-            while((line = bufReader.readLine()) != null) {
-            	lines.add(line);
-            }
-            if(removeHeader)
-            	lines.remove(0);
+			CSVParser parser = new CSVParser(new FileReader(file), CSVFormat.DEFAULT.withHeader()); 
 			
-			bufReader.close();
-			
+			for (CSVRecord record : parser) 
+				lines.add(record); 
+	
 		} catch (FileNotFoundException e) {
-			System.out.println("Error opening the File " + csvFile);
-			System.exit(0);
-		} catch (IOException e) {
-			System.out.println("Error IO exception " + csvFile);
+			System.out.println("The file path does not exist. Please check your CLI argument!");
 			System.exit(0);
 		}
-
+		
 		return lines;
 	}
 	
 	public static void writeAFile(ArrayList<String> lines, String targetFileName) {
-		File result = new File(targetFileName);
-		result.getParentFile().mkdirs();
-		
-		FileWriter outputStream = null;
-
-		try {
-			result.createNewFile();
-			outputStream = new FileWriter(result);
-			
-		} catch (IOException e) {
-			System.out.println("IOException Error");
-			System.exit(0);
-		}
-		
-		try {
-		outputStream.append("studentID");
-		outputStream.append(",");
-		outputStream.append("totalNumberOfSemester");
-		outputStream.append(",");
-		outputStream.append("Semester");
-		outputStream.append(",");
-		outputStream.append("NumCoursesTakenInTheSemester");
-		outputStream.append("\n");
-		
-		for(String aline:lines) {
-			outputStream.write(aline);
-			outputStream.write("\n");
-		}
-		
-		System.out.println("Success!");
-		outputStream.close();
-		
-		} catch (IOException e) {
-			System.out.println("IOException Error");
-			System.exit(0);
-		}
-		
+		try (CSVPrinter printer = new CSVPrinter(new FileWriter(targetFileName), CSVFormat.DEFAULT)) {
+		    for(String line:lines) {
+		    	String[] aline = line.split(",");
+		    	printer.printRecord(aline);
+		    }
+		    System.out.println("Finish!");
+		 } catch (IOException ex) {
+		     ex.printStackTrace();
+		 }
 	}
 
 }

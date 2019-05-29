@@ -73,5 +73,9 @@ public class Student {
 	public String getStudentId() {
 		return studentId;
 	}
+	
+	public ArrayList<Course> getCoursesTaken(){
+		return coursesTaken;
+	}
 
 }
